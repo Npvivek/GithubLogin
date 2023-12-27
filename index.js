@@ -1,9 +1,14 @@
+require("dotenv").config();
 const axios = require("axios");
 const express = require("express");
 const cors = require('cors');
 const path = require("path");
+
+
 const app = express();
 const PORT = 8000;
+const githubClientId = process.env.GITHUB_CLIENT_ID;
+const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
 
 
 app.use(cors());
@@ -14,14 +19,14 @@ app.get("/", (req, res) => {
 })
 
 app.get("/auth", (req, res) => {
-    res.redirect(`https://github.com/login/oauth/authorize?client_id=2e63a9cb2528d488121b&scope=user:email`);
+    res.redirect(`https://github.com/login/oauth/authorize?client_id=${githubClientId}&scope=user:email`);
 })
 
 app.get("/callback", async (req, res) => {
     try {
         const response = await axios.post("https://github.com/login/oauth/access_token", {
-            client_id: "2e63a9cb2528d488121b",
-            client_secret: "016c4fedd4f952e32f4433ec78a1a0e65fbbb3f2",
+            client_id: githubClientId,
+            client_secret: githubClientSecret,
             code: req.query.code
         }, {
             headers: {
@@ -46,8 +51,7 @@ app.get("/callback", async (req, res) => {
         };
 
         // You can now use the 'userData' object as per your requirements
-        console.log(userProfile.data);
-
+        console.log(userProfile);
         res.send(userProfile.data);
     } catch (err) {
         console.error(err);
@@ -56,5 +60,5 @@ app.get("/callback", async (req, res) => {
 });
 
 app.listen(PORT, '192.168.0.107', () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://192.168.0.107:${PORT}`);
 });
